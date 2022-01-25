@@ -1,38 +1,38 @@
-.App {
-  text-align: center;
+*, *::before, *::after
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border;
+  font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;	
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+:root
+{
+  --background: #faf8ef;
+  --2048_text: #776e65;
+  --score_card: #bbada0;
+  --score_text: #fff;
+  --newgame_text: #8f7a66;
+  --board_background: #bbada0;
+  --board_unfilled: #bbada0;
+  --2_block: #bbada0;
+  --4-block: #eee1c9;
+  --8-block: #f3b27a;
+  --16-block: #f69764;
+  --32-block: #f77c5f;
+  --64-block: #f75f3b;
+  --128-block: #edd073;
+  --256-block: #edcc62;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body
+{
+  background-color: var(--background);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.App
+{
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
