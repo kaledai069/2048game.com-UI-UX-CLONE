@@ -11,10 +11,12 @@
   --background: #faf8ef;
   --2048_text: #776e65;
   --score_card: #bbada0;
+  --SCORE-text: #f2e0c0;
   --score_text: #fff;
-  --newgame_text: #8f7a66;
+  --newgame_text: rgba(237,231,226,255);
+  --newgame_background: #8f7a66;
   --board_background: #bbada0;
-  --board_unfilled: #bbada0;
+  --board_unfilled: #ccc0b4;
   --2_block: #bbada0;
   --4-block: #eee1c9;
   --8-block: #f3b27a;

@@ -1,0 +1,22 @@
+.grid_box_container
+{
+    background-color: var(--board_background);
+    width: 450px;
+    height: 450px;
+    border-radius: 5px;
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    padding-left: 12px;
+    justify-content: space-evenly;
+}
+
+.div
+{
+    background-color: var(--board_unfilled);
+    border-radius: 3px;
+    width: 97.5px;
+    height: 97.5px;
+    margin-right: 12px;
+}
