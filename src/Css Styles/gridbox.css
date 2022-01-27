@@ -1,22 +1,75 @@
 .grid_box_container
 {
     background-color: var(--board_background);
-    width: 450px;
-    height: 450px;
-    border-radius: 5px;
-    margin-top: 25px;
+    width: 438px;
+    height: 438px;
     display: flex;
     flex-wrap: wrap;
-    padding-top: 12px;
+    margin-top: 25px;
+    border-radius: 5px;
     padding-left: 12px;
-    justify-content: space-evenly;
+    padding-top: 12px;
+    position: relative;
 }
 
-.div
+.grid
 {
     background-color: var(--board_unfilled);
     border-radius: 3px;
     width: 97.5px;
     height: 97.5px;
     margin-right: 12px;
+}
+
+.grid1
+{
+    position: absolute;
+    border-radius: 3px;
+    width: 97.5px;
+    height: 97.5px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid1 > span
+{
+    font-size: 44px;
+    font-weight: bolder;
+    color: white;
+}
+
+.scaler
+{
+    animation: grid_scaler 0.5s linear both;
+}
+
+@keyframes grid_scaler {
+    0%
+    {
+        transform: scale(0.0);
+    }
+    100%
+    {
+        transform: scale(1.0);
+    }
+}
+
+.animate_1_4
+{
+    animation: movement_1_4 0.2s linear both;
+}
+
+@keyframes movement_1_4 {
+    from
+    {
+        top: 12px;
+        left: 12px;
+    }
+    to
+    {
+        top: 12px;
+        left: 340.5px;
+    }
 }
