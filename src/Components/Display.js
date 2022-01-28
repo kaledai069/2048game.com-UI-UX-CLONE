@@ -17,7 +17,7 @@ function Display()
                         </div>
                         <div className="score_digit">69</div>
                     </div>
-                    <button class = 'btn'>new game</button>
+                    <button className = 'btn'>new game</button>
                 </div>
             </div>
         </>
