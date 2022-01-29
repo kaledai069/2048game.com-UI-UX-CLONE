@@ -15,72 +15,63 @@ const COLORS =
     256 : '#edcc62',
 }
 
-const initialState = [
-    [ {}, {}, {}, {} ], 
-    [ {}, {}, {}, {} ], 
-    [ {}, {}, {}, {} ], 
-    [ {}, {}, {}, {} ]
-];
-
-const reducer = (state, action)=>
-{
-    switch(action.type)
-    {
-        case 'test':
-            console.log('POS:', action.pos,'NUM: ', action.num)
-            let temp_arr = [];
-            temp_arr = state.map(boardArray => boardArray.map(item => item));
-            temp_arr[Math.floor(action.pos / 4)][action.pos%4] = 
-            {
-                text: action.num,
-                position: {
-                    top: `${12 + Math.floor(action.pos/4)*( 109.5 )}px`,
-                    left: `${12 + action.pos%4 * ( 109.5 )}px`
-                },
-                back_color: COLORS[action.num],
-                class_name: 'grid1 scaler'
-            }
-            //console.log(temp_arr);
-            return temp_arr;
-
-    }
-}
-
 function GridBox()
 {
-    const [board, dispatch] = useReducer(reducer, initialState)
+    const [board, updateBoard] = useState([
+        [ {}, {}, {}, {} ], 
+        [ {}, {}, {}, {} ], 
+        [ {}, {}, {}, {} ], 
+        [ {}, {}, {}, {} ]
+    ])
 
     useEffect(()=>
     {
         fill_random_pos();
+        fill_random_pos();
         document.addEventListener('keypress', handleKeyboardEvents);
     }, [])
 
-
-    const fill_board = (pos, num) =>
+    const get_available_space = (present_data) =>
     {
-        (()=>dispatch({type: 'test', pos: pos, num: num}))()
-        console.log('BOARD: ', board);
-    }
-
-    const fill_random_pos = ()=>
-    {
-
-        let pos = 0;
+        let count = 0;
         let temp_arr = [];
         for(let i = 0; i < 4; i++)
         {
-            for(let j = 0; j < 4; j++, pos++)
+            for(let j = 0; j < 4; j++, count++)
             {
-                if(Object.keys(board[i][j]).length === 0)
-                    temp_arr.push(pos)
+                if(Object.keys(present_data[i][j]).length === 0)
+                    temp_arr.push(count)
             }
         }
-        let random_pos = temp_arr[Math.floor(Math.random() * temp_arr.length)];
+        let pos = temp_arr[Math.floor(Math.random() * temp_arr.length)];
         let num = Math.floor(Math.random()*100) % 2 == 0 ? 2 : 4;
-        fill_board(random_pos, num)
+        return [pos, num];
     }
 
+    const fill_random_pos = () =>
+    {
+        updateBoard(prev_data => 
+        {
+            const [pos, num] = get_available_space(prev_data);
+            let temp = -1;
+            return prev_data.map(board_item => 
+                board_item.map(item =>
+                        (pos == ++temp) ? 
+                        {
+                            text: num,
+                            position: {
+                                top: `${12 + Math.floor(pos/4)*( 109.5 )}px`,
+                                left: `${12 + pos%4 * ( 109.5 )}px`
+                            },
+                            back_color: COLORS[num],
+                            class_name: 'grid1 scaler'  
+                        }  
+                        :
+                        item
+                    )
+                )
+        })
+    }
 
     const handleKeyboardEvents = e =>
     {
@@ -91,9 +82,7 @@ function GridBox()
         <div className="grid_box_container">
             <BackGrid/>
             {
-                board.map(boardItem => {
-                    return (boardItem.map((item, index) => <Grid key={index} data = {item} />))
-                })
+                board.map(board_item => board_item.map((item, index) => <Grid key = {index} data = {item}/>))
             }
         </div>
     )
