@@ -28,8 +28,9 @@ function GridBox()
     {
         fill_random_pos();
         fill_random_pos();
-        document.addEventListener('keypress', handleKeyboardEvents);
+        document.addEventListener('keydown', handleKeyboardEvents);
     }, [])
+
 
     const get_available_space = (present_data) =>
     {
@@ -64,7 +65,9 @@ function GridBox()
                                 left: `${12 + pos%4 * ( 109.5 )}px`
                             },
                             back_color: COLORS[num],
-                            class_name: 'grid1 scaler'  
+                            class_name: 'grid1 scaler',
+                            i_pos: Math.floor(pos/4)+1,
+                            j_pos: pos%4 + 1, 
                         }  
                         :
                         item
@@ -75,7 +78,10 @@ function GridBox()
 
     const handleKeyboardEvents = e =>
     {
-        fill_random_pos();
+        if(e.code == 'ArrowLeft')
+        {
+            console.log(board);
+        }
     }
 
     return (
