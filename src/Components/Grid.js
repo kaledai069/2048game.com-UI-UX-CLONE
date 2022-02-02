@@ -10,7 +10,6 @@ function Grid({data})
             top: data.position.top,
             left: data.position.left,
             backgroundColor: data.back_color,
-            
         }
     }
     
