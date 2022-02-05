@@ -26,6 +26,8 @@ function GridBox()
 
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
 
+    const [movement_tracker, updateMovements] = useState([]);
+
     const handleKeyboardEvents = (event) =>
     {
         if(event.key == ' ')
@@ -34,11 +36,11 @@ function GridBox()
         }
         else if(event.code == 'ArrowLeft')
         {
-            console.log("pressed arrow left")
+            //console.log("pressed arrow left")
         }
         else if(event.code == 'ArrowUp')
         {
-            console.log(board_vals);
+            console.log(movement_tracker);
         }
     }
 
@@ -47,7 +49,17 @@ function GridBox()
     {
         fill_random_pos();
         fill_random_pos();
-        calc_displacement([0, 0, 4, 4]);
+        let temp_arr = [
+            [0, 0, 4, 4],
+            [0, 0, 0, 0],
+            [0, 2, 4, 0],
+            [0, 0, 0, 0]
+        ]
+        temp_arr.forEach((arr_item, index) => 
+        {
+            console.log(calc_displacement(arr_item, index) )
+        });
+        //calc_displacement([0, 0, 2, 4], 0);
     }, [])
 
     useEffect(()=>
@@ -75,35 +87,43 @@ function GridBox()
         updateBoardVals(board_copy);
     }
 
-    function calc_displacement(test_array)
+    function calc_displacement(test_array, row_val)
     {
         let temp_int;
+        let movements = []
         for(let i = 0; i < 4; i++)
         {
             if(test_array[i] !== 0 && i !== 0)
             {
+                let pos_obj = {};
+                pos_obj = {...pos_obj, initial_row: row_val, initial_column: i, final_row: row_val};
                 temp_int = test_array[i];
                 test_array[i] = 0;
                 for(let k = i - 1; k >= 0; k--)
                 {
                     if(test_array[k] === temp_int)
                     {
+                        pos_obj = {...pos_obj, final_column: k};
                         test_array[k] = 2 * temp_int;
                         break;
                     }
                     else if(test_array[k] !== 0 && test_array[k] !== temp_int)
                     {
+                        pos_obj = {...pos_obj, final_column: k+1};
                         test_array[k+1] = temp_int;
                         break;
                     }
                     else if(k === 0)
                     {
+                        pos_obj = {...pos_obj, final_column: k};
                         test_array[k] = temp_int;
                     }
                 }
+                movements.push(pos_obj);
+                //updateMovements(prev_arr_items => [...prev_arr_items, pos_obj]);
             }
         }
-        //console.log(test_array);
+        return movements;
     }
 
     const get_available_space = (present_data) =>
