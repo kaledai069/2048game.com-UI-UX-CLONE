@@ -26,6 +26,7 @@ function GridBox()
     ])
 
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
+    const [run, updateRunVal] = useState(true);
 
     const handleKeyboardEvents = (event) =>
     {
@@ -36,12 +37,22 @@ function GridBox()
         else if(event.code == 'ArrowLeft')
         {
             let movement_tracker = [];
+            let updated_board_vals = [];
+            updateRunVal(false);
+
+            console.log(board_vals);
             board_vals.forEach((arr_item, index) =>
             {
-                movement_tracker.push(calc_displacement(arr_item, index));
+                let [movement_val, updated_array] = calc_displacement(arr_item, index);
+                movement_tracker.push(movement_val);
+                updated_board_vals.push(updated_array);
             })
             movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
-            console.log(movement_tracker);
+
+            updateBoardVals(prev_vals => {
+                return updated_board_vals;
+            })
+
             updateBoard(prev_board => 
             {
                 let board_copy = prev_board.map(board_item => board_item.map(item => item));
@@ -58,7 +69,7 @@ function GridBox()
         }
         else if(event.code == 'ArrowUp')
         {
-
+            console.log(board_vals);
         }
     }
 
@@ -67,22 +78,22 @@ function GridBox()
     {
         fill_random_pos();
         fill_random_pos();
-        let temp_arr = [
-            [0, 0, 4, 4],
-            [0, 0, 0, 0],
-            [0, 2, 4, 0],
-            [0, 0, 0, 0]
-        ]
-        // temp_arr.forEach((arr_item, index) => 
-        // {
-        //     console.log(calc_displacement(arr_item, index) )
-        // });
-        //calc_displacement([0, 0, 2, 4], 0);
+
+        let test_array = [0, 4, 4, 4];
+        console.log(calc_displacement(test_array, 0));
     }, [])
 
     useEffect(()=>
     {
-        update_copy_board_vals();
+        setTimeout(()=>
+        {
+            update_actual_board_obj(!run)
+        }, 220)
+    }, [board_vals])
+
+    useEffect(()=>
+    {
+        update_copy_board_vals(run);
         console.log(board);
     }, [board]);
 
@@ -92,24 +103,76 @@ function GridBox()
         return ()=>document.removeEventListener('keydown', handleKeyboardEvents);
     }, [handleKeyboardEvents])
 
-    function update_copy_board_vals()
+    function update_actual_board_obj(play_func)
     {
-        let board_copy = Array(4).fill().map(()=>Array(4).fill(0));
-        for(let i = 0; i < 4; i++)
+        if(play_func)
         {
-            for(let j = 0; j < 4; j++)
+            updateBoard(prev_board => 
             {
-                if(Object.keys(board[i][j]).length !== 0)
-                    board_copy[i][j] = board[i][j].text;
-            }
+                let temp_new_board = 
+                [
+                    [ {}, {}, {}, {} ], 
+                    [ {}, {}, {}, {} ], 
+                    [ {}, {}, {}, {} ], 
+                    [ {}, {}, {}, {} ]
+                ]
+                for(let i = 0; i < 4; i++)
+                {
+                    for(let j = 0; j < 4; j++)
+                    {
+                        if(board_vals[i][j] !== 0)
+                        {
+                            if(board_vals[i][j] !== prev_board[i][j].text)
+                            {
+                                temp_new_board[i][j] = 
+                                {
+                                    text: board_vals[i][j],
+                                    position: {
+                                        top: `${12 + i*( 109.5)}px`,
+                                        left: `${12 + j * ( 109.5 )}px`
+                                    },
+                                    back_color: COLORS[board_vals[i][j]],
+                                    class_name: 'grid1',
+                                }
+                            }
+                            else if(board_vals[i][j] === prev_board[i][j].text)
+                            {
+                                let temp_obj_movement = prev_board[i][j];
+                                temp_obj_movement.class_name = 'grid1';
+                                temp_new_board[i][j] = temp_obj_movement;
+                            }
+                        }
+                    }
+                }
+                console.log(temp_new_board);
+                return temp_new_board;
+            })
+            fill_random_pos();
         }
-        updateBoardVals(board_copy);
+    }
+
+    function update_copy_board_vals(play_func)
+    {
+        if(play_func)
+        {
+            let board_copy = Array(4).fill().map(()=>Array(4).fill(0));
+            for(let i = 0; i < 4; i++)
+            {
+                for(let j = 0; j < 4; j++)
+                {
+                    if(Object.keys(board[i][j]).length !== 0)
+                        board_copy[i][j] = board[i][j].text;
+                }
+            }
+            updateBoardVals(board_copy);
+        }
     }
 
     function calc_displacement(test_array, row_val)
     {
         let temp_int;
         let movements = []
+        let updated_index = [];
         for(let i = 0; i < 4; i++)
         {
             if(test_array[i] !== 0 && i !== 0)
@@ -142,9 +205,9 @@ function GridBox()
             }
         }
         if(movements.length !== 0)
-            return movements;
+            return [movements, test_array];
         else 
-            return 0;
+            return [0, test_array];
     }
 
     const get_available_space = (present_data) =>
@@ -166,6 +229,7 @@ function GridBox()
 
     const fill_random_pos = () =>
     {
+        updateRunVal(true);
         updateBoard(prev_data => 
         {
             const [pos, num] = get_available_space(prev_data);
@@ -181,8 +245,6 @@ function GridBox()
                             },
                             back_color: COLORS[num],
                             class_name: 'grid1 scaler',
-                            i_pos: Math.floor(pos/4)+1,
-                            j_pos: pos%4 + 1, 
                         }  
                         :
                         item
