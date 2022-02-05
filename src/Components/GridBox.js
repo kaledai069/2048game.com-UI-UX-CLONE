@@ -2,6 +2,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import Grid from './Grid';
 import BackGrid from './BackGrid';
 import '../Css Styles/gridbox.css'
+import '../Css Styles/animate.css';
 
 const COLORS =
 {
@@ -26,8 +27,6 @@ function GridBox()
 
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
 
-    const [movement_tracker, updateMovements] = useState([]);
-
     const handleKeyboardEvents = (event) =>
     {
         if(event.key == ' ')
@@ -36,11 +35,30 @@ function GridBox()
         }
         else if(event.code == 'ArrowLeft')
         {
-            //console.log("pressed arrow left")
+            let movement_tracker = [];
+            board_vals.forEach((arr_item, index) =>
+            {
+                movement_tracker.push(calc_displacement(arr_item, index));
+            })
+            movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
+            console.log(movement_tracker);
+            updateBoard(prev_board => 
+            {
+                let board_copy = prev_board.map(board_item => board_item.map(item => item));
+                movement_tracker.forEach(item => 
+                    {
+                        item.forEach(sub_item =>
+                            {
+                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                            })
+                    })
+                return board_copy;
+            })
         }
         else if(event.code == 'ArrowUp')
         {
-            console.log(movement_tracker);
+
         }
     }
 
@@ -55,16 +73,17 @@ function GridBox()
             [0, 2, 4, 0],
             [0, 0, 0, 0]
         ]
-        temp_arr.forEach((arr_item, index) => 
-        {
-            console.log(calc_displacement(arr_item, index) )
-        });
+        // temp_arr.forEach((arr_item, index) => 
+        // {
+        //     console.log(calc_displacement(arr_item, index) )
+        // });
         //calc_displacement([0, 0, 2, 4], 0);
     }, [])
 
     useEffect(()=>
     {
         update_copy_board_vals();
+        console.log(board);
     }, [board]);
 
     useEffect(()=>
@@ -120,10 +139,12 @@ function GridBox()
                     }
                 }
                 movements.push(pos_obj);
-                //updateMovements(prev_arr_items => [...prev_arr_items, pos_obj]);
             }
         }
-        return movements;
+        if(movements.length !== 0)
+            return movements;
+        else 
+            return 0;
     }
 
     const get_available_space = (present_data) =>
