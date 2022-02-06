@@ -32,7 +32,7 @@ function GridBox()
 
     const handleKeyboardEvents = (event) =>
     {
-        let key_pressed_string;
+        let key_pressed_string = '';
         if(event.key == ' ')
         {
             fill_random_pos();
@@ -40,35 +40,6 @@ function GridBox()
         else if(event.code == 'ArrowLeft')
         {
             key_pressed_string = 'ArrowLeft';
-            let movement_tracker = [];
-            let updated_board_vals = [];
-            updateRunVal(false);
-
-            board_vals.forEach((arr_item, index) =>
-            {
-                let [movement_val, updated_array] = calc_displacement(arr_item, index);
-                movement_tracker.push(movement_val);
-                updated_board_vals.push(updated_array);
-            })
-            movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
-
-            updateBoardVals(prev_vals => {
-                return updated_board_vals;
-            })
-
-            updateBoard(prev_board => 
-            {
-                let board_copy = prev_board.map(board_item => board_item.map(item => item));
-                movement_tracker.forEach(item => 
-                    {
-                        item.forEach(sub_item =>
-                            {
-                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
-                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
-                            })
-                    })
-                return board_copy;
-            })
         }
         else if(event.code === 'ArrowUp')
         {
@@ -82,7 +53,11 @@ function GridBox()
         {
             key_pressed_string = 'ArrowRight';
         }
-        updateKeyQueue(prev_key_queue => [...prev_key_queue, key_pressed_string]);
+
+        if(key_pressed_string.length > 0)
+        {
+            updateKeyQueue(prev_key_queue => [...prev_key_queue, key_pressed_string]);
+        }
     }
 
     // for the key animation keys
@@ -91,7 +66,7 @@ function GridBox()
         const timeOutId = setInterval(()=>
         {
             run_keys_effect();
-        }, 200);
+        }, 80);
         return ()=>clearInterval(timeOutId);
     }, [key_pressed_queue, queue_index])
 
@@ -107,8 +82,8 @@ function GridBox()
     {
         setTimeout(()=>
         {
-            update_actual_board_obj(!run)
-        }, 220)
+            update_actual_board_obj(!run);
+        }, 70)
     }, [board_vals])
 
     // for the initial copy from the board to the board values
@@ -124,23 +99,195 @@ function GridBox()
         return ()=>document.removeEventListener('keydown', handleKeyboardEvents);
     }, [handleKeyboardEvents])
 
+    function arrow_down_movment()
+    {
+        let movement_tracker = [];
+        let updated_board_vals = [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ];
+        updateRunVal(false);
+
+        let extracted_array = [];
+        for(let i = 0; i < 4; i++)
+        {
+            extracted_array = [];
+            for(let j = 0; j < 4; j++)
+            {
+                extracted_array.push(board_vals[j][i]);
+            }
+            let [movement_val, updated_array] = up_down_calc_displacement(extracted_array.reverse(), i, 'down');
+            movement_tracker.push(movement_val);
+            for(let j = 0; j < 4; j++)
+            {
+                updated_board_vals[j][i] = updated_array[j];
+            }
+        }
+        movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0)
+
+        updateBoardVals(prev_vals => {
+            return updated_board_vals;
+        })
+
+        updateBoard(prev_board => 
+            {
+                let board_copy = prev_board.map(board_item => board_item.map(item => item));
+                movement_tracker.forEach(item => 
+                    {
+                        item.forEach(sub_item =>
+                            {
+                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                            })
+                    })
+                return board_copy;
+            })
+    }
+
+    function arrow_up_movement()
+    {
+        let movement_tracker = [];
+        let updated_board_vals = [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+        ];
+        updateRunVal(false);
+
+        let extracted_array = [];
+        for(let i = 0; i < 4; i++)
+        {
+            extracted_array = [];
+            for(let j = 0; j < 4; j++)
+            {
+                extracted_array.push(board_vals[j][i]);
+            }
+            let [movement_val, updated_array] = up_down_calc_displacement(extracted_array, i, 'up');
+            movement_tracker.push(movement_val);
+            for(let j = 0; j < 4; j++)
+            {
+                updated_board_vals[j][i] = updated_array[j];
+            }
+        }
+        movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0)
+
+        updateBoardVals(prev_vals => {
+            return updated_board_vals;
+        })
+
+        updateBoard(prev_board => 
+            {
+                let board_copy = prev_board.map(board_item => board_item.map(item => item));
+                movement_tracker.forEach(item => 
+                    {
+                        item.forEach(sub_item =>
+                            {
+                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                            })
+                    })
+                return board_copy;
+            })
+    }
+
+    function arrow_right_movement()
+    {
+        let movement_tracker = [];
+        let updated_board_vals = [];
+        updateRunVal(false);
+
+        board_vals.forEach((arr_item, index) =>
+        {
+            let [movement_val, updated_array] = calc_displacement(arr_item.reverse(), index, 'right');
+            movement_tracker.push(movement_val);
+            updated_board_vals.push(updated_array);
+        })
+        movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
+        console.log(movement_tracker)
+        updateBoardVals(prev_vals => {
+            return updated_board_vals;
+        })
+
+        updateBoard(prev_board => 
+            {
+                let board_copy = prev_board.map(board_item => board_item.map(item => item));
+                movement_tracker.forEach(item => 
+                    {
+                        item.forEach(sub_item =>
+                            {
+                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                            })
+                    })
+                return board_copy;
+            })
+    }
+
+    function arrow_left_movement()
+    {
+        let movement_tracker = [];
+        let updated_board_vals = [];
+        updateRunVal(false);
+
+        board_vals.forEach((arr_item, index) =>
+        {
+            let [movement_val, updated_array] = calc_displacement(arr_item, index, 'left');
+            movement_tracker.push(movement_val);
+            updated_board_vals.push(updated_array);
+        })
+        movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
+
+        updateBoardVals(prev_vals => {
+            return updated_board_vals;
+        })
+
+        updateBoard(prev_board => 
+        {
+            let board_copy = prev_board.map(board_item => board_item.map(item => item));
+            movement_tracker.forEach(item => 
+                {
+                    item.forEach(sub_item =>
+                        {
+                            let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                            board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                        })
+                })
+            return board_copy;
+        })
+    }
 
     function run_keys_effect()
     {
         if(key_pressed_queue.length > 0 && queue_index < key_pressed_queue.length)
         {
+            console.log(key_pressed_queue[queue_index]);
             switch(key_pressed_queue[queue_index])
             {
                 case 'ArrowLeft':
+                    arrow_left_movement();
+                    //fill_random_pos();
+                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowRight':
+                    arrow_right_movement();
+                    //fill_random_pos();
+                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowUp':
+                    arrow_up_movement();
+                    //fill_random_pos();
+                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowDown':
+                    arrow_down_movment();
+                    //fill_random_pos();
+                    updateQueueIndex(queue_index + 1);
                     break;
             }
-            updateQueueIndex(queue_index + 1);
+            
         }
     }
 
@@ -185,10 +332,8 @@ function GridBox()
                         }
                     }
                 }
-                console.log(temp_new_board);
                 return temp_new_board;
             })
-            fill_random_pos();
         }
     }
 
@@ -209,36 +354,75 @@ function GridBox()
         }
     }
 
-    function calc_displacement(test_array, row_val)
+    function column_index(dir, index)
+    {
+        switch(dir)
+        {
+            case 'left':
+                return index;
+            case 'right':
+                return 3 - index;
+        }
+    }
+
+    function array_order_adjustifier(direction, array)
+    {
+        switch(direction)
+        {
+            case 'left':
+                return array;
+            case 'right':
+                return array.reverse();
+            case 'up':
+                return array;
+            case 'down':
+                return array.reverse();
+        }
+    }
+
+    function row_index(direction, index)
+    {
+        switch(direction)
+        {
+            case 'up':
+                return index;
+            case 'down':
+                return 3 - index;
+        }
+    }
+
+    function up_down_calc_displacement(test_array, column_val, direction)
     {
         let temp_int;
         let movements = []
-        let updated_index = [];
+
         for(let i = 0; i < 4; i++)
         {
             if(test_array[i] !== 0 && i !== 0)
             {
                 let pos_obj = {};
-                pos_obj = {...pos_obj, initial_row: row_val, initial_column: i, final_row: row_val};
+                //pos_obj = {...pos_obj, initial_row: row_val, initial_column: column_index(direction, i), final_row: row_val};
+                pos_obj = {...pos_obj, initial_row: row_index(direction, i), initial_column: column_val, final_column: column_val};
                 temp_int = test_array[i];
                 test_array[i] = 0;
                 for(let k = i - 1; k >= 0; k--)
                 {
                     if(test_array[k] === temp_int)
                     {
-                        pos_obj = {...pos_obj, final_column: k};
+                        // pos_obj = {...pos_obj, final_column: column_index(direction, k)};
+                        pos_obj = {...pos_obj, final_row: row_index(direction, k)};
                         test_array[k] = 2 * temp_int;
                         break;
                     }
                     else if(test_array[k] !== 0 && test_array[k] !== temp_int)
                     {
-                        pos_obj = {...pos_obj, final_column: k+1};
+                        pos_obj = {...pos_obj, final_row: row_index(direction, k + 1)};
                         test_array[k+1] = temp_int;
                         break;
                     }
                     else if(k === 0)
                     {
-                        pos_obj = {...pos_obj, final_column: k};
+                        pos_obj = {...pos_obj, final_row: row_index(direction, k)};
                         test_array[k] = temp_int;
                     }
                 }
@@ -246,9 +430,52 @@ function GridBox()
             }
         }
         if(movements.length !== 0)
-            return [movements, test_array];
+            return [movements, array_order_adjustifier(direction, test_array)];
         else 
-            return [0, test_array];
+            return [0, array_order_adjustifier(direction, test_array)];
+    }
+
+
+    function calc_displacement(test_array, row_val, direction)
+    {
+        let temp_int;
+        let movements = []
+
+        for(let i = 0; i < 4; i++)
+        {
+            if(test_array[i] !== 0 && i !== 0)
+            {
+                let pos_obj = {};
+                pos_obj = {...pos_obj, initial_row: row_val, initial_column: column_index(direction, i), final_row: row_val};
+                temp_int = test_array[i];
+                test_array[i] = 0;
+                for(let k = i - 1; k >= 0; k--)
+                {
+                    if(test_array[k] === temp_int)
+                    {
+                        pos_obj = {...pos_obj, final_column: column_index(direction, k)};
+                        test_array[k] = 2 * temp_int;
+                        break;
+                    }
+                    else if(test_array[k] !== 0 && test_array[k] !== temp_int)
+                    {
+                        pos_obj = {...pos_obj, final_column: column_index(direction, k + 1)};
+                        test_array[k+1] = temp_int;
+                        break;
+                    }
+                    else if(k === 0)
+                    {
+                        pos_obj = {...pos_obj, final_column: column_index(direction, k)};
+                        test_array[k] = temp_int;
+                    }
+                }
+                movements.push(pos_obj);
+            }
+        }
+        if(movements.length !== 0)
+            return [movements, array_order_adjustifier(direction, test_array)];
+        else 
+            return [0, array_order_adjustifier(direction, test_array)];
     }
 
     const get_available_space = (present_data) =>

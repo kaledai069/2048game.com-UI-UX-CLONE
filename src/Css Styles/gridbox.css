@@ -42,7 +42,7 @@
 
 .scaler
 {
-    animation: grid_scaler 0.2s linear both;
+    animation: grid_scaler 0.1s linear both;
 }
 
 @keyframes grid_scaler {
