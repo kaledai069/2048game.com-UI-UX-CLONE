@@ -62,12 +62,27 @@ function GridBox()
 
     // for the key animation keys
     useEffect(()=>
-    {
-        const timeOutId = setInterval(()=>
+    {   
+        let timeout_id;
+        const interval_id = setInterval(()=>
         {
             run_keys_effect();
         }, 80);
-        return ()=>clearInterval(timeOutId);
+        // if(!run)
+        // {
+        //     timeout_id = setTimeout(()=>
+        //     {
+        //         fill_random_pos();
+        //     }, 100)
+        // }
+        return ()=>
+        {
+            clearInterval(interval_id)
+            // if(!run)
+            // {
+            //     clearTimeout(timeout_id);
+            // }
+        };
     }, [key_pressed_queue, queue_index])
 
     // for the initial run
@@ -268,27 +283,34 @@ function GridBox()
             {
                 case 'ArrowLeft':
                     arrow_left_movement();
-                    //fill_random_pos();
-                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowRight':
                     arrow_right_movement();
-                    //fill_random_pos();
-                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowUp':
                     arrow_up_movement();
-                    //fill_random_pos();
-                    updateQueueIndex(queue_index + 1);
                     break;
                 case 'ArrowDown':
                     arrow_down_movment();
-                    //fill_random_pos();
-                    updateQueueIndex(queue_index + 1);
                     break;
             }
+            updateQueueIndex(prev_value => 
+                {
+                    create_and_reset();
+                    return prev_value + 1;
+                });
             
         }
+    }
+
+    function create_and_reset()
+    {
+        const time_out_id = setInterval(()=>
+        {
+            console.log("Running queue upgrade");
+            fill_random_pos();
+            clearInterval(time_out_id);
+        }, 80)
     }
 
     function update_actual_board_obj(play_func)
@@ -435,7 +457,6 @@ function GridBox()
             return [0, array_order_adjustifier(direction, test_array)];
     }
 
-
     function calc_displacement(test_array, row_val, direction)
     {
         let temp_int;
@@ -520,6 +541,41 @@ function GridBox()
                 )
         })
     }
+
+    // function get_empty_space(present_data)
+    // {
+    //     let count = 0;
+    //     let temp_arr = [];
+    //     for(let i = 0; i < 4; i++)
+    //     {
+    //         for(let j = 0; j < 4; j++, count++)
+    //         {
+    //             if(present_data[i][j] === 0)
+    //                 temp_arr.push(count)
+    //         }
+    //     }
+    //     let pos = temp_arr[Math.floor(Math.random() * temp_arr.length)];
+    //     let num = Math.floor(Math.random()*100) % 2 == 0 ? 2 : 4;
+    //     return [pos, num];
+    // }
+
+    // function fill_available_space()
+    // {
+    //     updateBoardVals(prev_data =>
+    //     {
+    //         const [pos, num] = get_empty_space(prev_data);
+    //         console.log(pos, num);
+    //         let temp = -1;
+    //         return prev_data.map(board_item =>
+    //             {
+    //                 board_item.map(item =>
+    //                     (pos === ++temp) ? 
+    //                     num : 
+    //                     item
+    //                     )
+    //             })
+    //     })
+    // }
 
     return (
         <div className="grid_box_container">
