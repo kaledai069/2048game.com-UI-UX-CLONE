@@ -26,21 +26,24 @@ function GridBox()
     ])
 
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
+    const [key_pressed_queue, updateKeyQueue] = useState([]);
+    const [queue_index, updateQueueIndex] = useState(0);
     const [run, updateRunVal] = useState(true);
 
     const handleKeyboardEvents = (event) =>
     {
+        let key_pressed_string;
         if(event.key == ' ')
         {
             fill_random_pos();
         }
         else if(event.code == 'ArrowLeft')
         {
+            key_pressed_string = 'ArrowLeft';
             let movement_tracker = [];
             let updated_board_vals = [];
             updateRunVal(false);
 
-            console.log(board_vals);
             board_vals.forEach((arr_item, index) =>
             {
                 let [movement_val, updated_array] = calc_displacement(arr_item, index);
@@ -67,22 +70,39 @@ function GridBox()
                 return board_copy;
             })
         }
-        else if(event.code == 'ArrowUp')
+        else if(event.code === 'ArrowUp')
         {
-            console.log(board_vals);
+            key_pressed_string = 'ArrowUp';
         }
+        else if(event.code === 'ArrowDown')
+        {
+            key_pressed_string = 'ArrowDown';
+        }
+        else if(event.code === 'ArrowRight')
+        {
+            key_pressed_string = 'ArrowRight';
+        }
+        updateKeyQueue(prev_key_queue => [...prev_key_queue, key_pressed_string]);
     }
+
+    // for the key animation keys
+    useEffect(()=>
+    {
+        const timeOutId = setInterval(()=>
+        {
+            run_keys_effect();
+        }, 200);
+        return ()=>clearInterval(timeOutId);
+    }, [key_pressed_queue, queue_index])
 
     // for the initial run
     useEffect(()=>
     {
         fill_random_pos();
         fill_random_pos();
-
-        let test_array = [0, 4, 4, 4];
-        console.log(calc_displacement(test_array, 0));
     }, [])
 
+    // for the board copied values to update the actual board animation
     useEffect(()=>
     {
         setTimeout(()=>
@@ -91,17 +111,38 @@ function GridBox()
         }, 220)
     }, [board_vals])
 
+    // for the initial copy from the board to the board values
     useEffect(()=>
     {
         update_copy_board_vals(run);
-        console.log(board);
     }, [board]);
 
+    // to set and reset the event handlers for the keyboard keys
     useEffect(()=>
     {
         document.addEventListener('keydown', handleKeyboardEvents);
         return ()=>document.removeEventListener('keydown', handleKeyboardEvents);
     }, [handleKeyboardEvents])
+
+
+    function run_keys_effect()
+    {
+        if(key_pressed_queue.length > 0 && queue_index < key_pressed_queue.length)
+        {
+            switch(key_pressed_queue[queue_index])
+            {
+                case 'ArrowLeft':
+                    break;
+                case 'ArrowRight':
+                    break;
+                case 'ArrowUp':
+                    break;
+                case 'ArrowDown':
+                    break;
+            }
+            updateQueueIndex(queue_index + 1);
+        }
+    }
 
     function update_actual_board_obj(play_func)
     {
