@@ -3,7 +3,7 @@ import Grid from './Grid';
 import BackGrid from './BackGrid';
 import '../Css Styles/gridbox.css'
 import '../Css Styles/animate.css';
-import { score_context } from './Main';
+import { NewGameContext, score_context } from './Main';
 
 const COLORS =
 {
@@ -17,22 +17,32 @@ const COLORS =
     256 : '#edcc62',
 }
 
+const initial_board_state = [
+    [ {}, {}, {}, {} ], 
+    [ {}, {}, {}, {} ], 
+    [ {}, {}, {}, {} ], 
+    [ {}, {}, {}, {} ]
+];
+
+const initial_board_value = 
+    [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ]
+
 function GridBox()
 {
     const score = useContext(score_context);
 
-    const [board, updateBoard] = useState([
-        [ {}, {}, {}, {} ], 
-        [ {}, {}, {}, {} ], 
-        [ {}, {}, {}, {} ], 
-        [ {}, {}, {}, {} ]
-    ])
-
+    const [board, updateBoard] = useState(initial_board_state);
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
     const [key_pressed_queue, updateKeyQueue] = useState([]);
     const [queue_index, updateQueueIndex] = useState(0);
     const [run, updateRunVal] = useState(true);
     const [is_possible_to_fil, updateFillBool] = useState(true);
+    const new_game_value = useContext(NewGameContext);
 
     const handleKeyboardEvents = (event) =>
     {
@@ -64,6 +74,24 @@ function GridBox()
         }
     }
 
+    useEffect(()=>
+    {
+        if(new_game_value.new_game == 1)
+        {
+            updateBoard(initial_board_state);
+            updateBoardVals(initial_board_value);
+            updateKeyQueue([]);
+            updateQueueIndex(0);
+            updateRunVal(true);
+            updateFillBool(true);
+            fill_random_pos();
+            fill_random_pos();
+            score.updater(0);
+        }
+    }, [new_game_value.new_game])
+
+
+
     // for the key animation keys
     useEffect(()=>
     {   
@@ -82,6 +110,15 @@ function GridBox()
     {
         fill_random_pos();
         fill_random_pos();
+
+        // let temp_2D_array = 
+        // [
+        //     [2, 4, 8, 4],
+        //     [8, 16, 64, 2],
+        //     [16, 32, 128, 8],
+        //     [4, 8, 2, 4]
+        // ]
+        // updateBoardVals(temp_2D_array);
     }, [])
 
     // for the board copied values to update the actual board animation
@@ -130,7 +167,7 @@ function GridBox()
             if(!compare_2D_array(check_2D_array, board_vals))
             {
                 check_2D_array = [];
-                board_vals.forEach((arr_item, item, index) =>
+                board_vals.forEach((arr_item, index) =>
                 {
                     let [__empty__, updated_row] = calc_displacement(arr_item.reverse(), index, 'right');
                     check_2D_array.push(updated_row)
@@ -184,8 +221,6 @@ function GridBox()
                             console.log("GAME OVER, NO POSSIBLE MOVES")
                         }
                     }
-                    
-
                 }
             }
         }
