@@ -29,6 +29,7 @@ function GridBox()
     const [key_pressed_queue, updateKeyQueue] = useState([]);
     const [queue_index, updateQueueIndex] = useState(0);
     const [run, updateRunVal] = useState(true);
+    const [is_possible_to_fil, updateFillBool] = useState(true);
 
     const handleKeyboardEvents = (event) =>
     {
@@ -60,6 +61,15 @@ function GridBox()
         }
     }
 
+    // useEffect(()=>
+    // {
+    //     console.log(is_possible_to_fil);
+    //     if(is_possible_to_fil)
+    //     {
+    //         create_and_reset();
+    //     }
+    // }, [is_possible_to_fil])
+
     // for the key animation keys
     useEffect(()=>
     {   
@@ -68,20 +78,9 @@ function GridBox()
         {
             run_keys_effect();
         }, 80);
-        // if(!run)
-        // {
-        //     timeout_id = setTimeout(()=>
-        //     {
-        //         fill_random_pos();
-        //     }, 100)
-        // }
         return ()=>
         {
             clearInterval(interval_id)
-            // if(!run)
-            // {
-            //     clearTimeout(timeout_id);
-            // }
         };
     }, [key_pressed_queue, queue_index])
 
@@ -124,6 +123,7 @@ function GridBox()
             [0, 0, 0, 0],
         ];
         updateRunVal(false);
+        let temp_board_vals_copy = board_vals.map(board_item => board_item.map(item => item));
 
         let extracted_array = [];
         for(let i = 0; i < 4; i++)
@@ -141,6 +141,16 @@ function GridBox()
             }
         }
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0)
+        
+        updateFillBool(prev_state => 
+            {   
+                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+                if(present_state)
+                {
+                    create_and_reset();
+                }
+                return present_state;
+            });
 
         updateBoardVals(prev_vals => {
             return updated_board_vals;
@@ -171,7 +181,7 @@ function GridBox()
             [0, 0, 0, 0],
         ];
         updateRunVal(false);
-
+        let temp_board_vals_copy = board_vals.map(board_item => board_item.map(item => item));
         let extracted_array = [];
         for(let i = 0; i < 4; i++)
         {
@@ -188,6 +198,16 @@ function GridBox()
             }
         }
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0)
+        
+        updateFillBool(prev_state => 
+            {   
+                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+                if(present_state)
+                {
+                    create_and_reset();
+                }
+                return present_state;
+            });
 
         updateBoardVals(prev_vals => {
             return updated_board_vals;
@@ -208,12 +228,21 @@ function GridBox()
             })
     }
 
+    function compare_2D_array(first_array, second_array)
+    {
+        for(let i = 0; i < 4; i++)
+            for(let j = 0; j < 4 ; j++)
+                if(first_array[i][j] !== second_array[i][j])
+                    return true;
+        return false;
+    }
+
     function arrow_right_movement()
     {
         let movement_tracker = [];
         let updated_board_vals = [];
         updateRunVal(false);
-
+        let temp_board_vals_copy = board_vals.map(board_item => board_item.map(item => item));
         board_vals.forEach((arr_item, index) =>
         {
             let [movement_val, updated_array] = calc_displacement(arr_item.reverse(), index, 'right');
@@ -221,7 +250,17 @@ function GridBox()
             updated_board_vals.push(updated_array);
         })
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
-        console.log(movement_tracker)
+        
+        updateFillBool(prev_state => 
+            {   
+                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+                if(present_state)
+                {
+                    create_and_reset();
+                }
+                return present_state;
+            });
+
         updateBoardVals(prev_vals => {
             return updated_board_vals;
         })
@@ -247,6 +286,8 @@ function GridBox()
         let updated_board_vals = [];
         updateRunVal(false);
 
+        let temp_board_vals_copy = board_vals.map(board_item => board_item.map(item => item));
+
         board_vals.forEach((arr_item, index) =>
         {
             let [movement_val, updated_array] = calc_displacement(arr_item, index, 'left');
@@ -255,6 +296,16 @@ function GridBox()
         })
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
 
+        console.log(compare_2D_array(temp_board_vals_copy, updated_board_vals));
+        updateFillBool(prev_state => 
+            {   
+                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+                if(present_state)
+                {
+                    create_and_reset();
+                }
+                return present_state;
+            });
         updateBoardVals(prev_vals => {
             return updated_board_vals;
         })
@@ -278,7 +329,7 @@ function GridBox()
     {
         if(key_pressed_queue.length > 0 && queue_index < key_pressed_queue.length)
         {
-            console.log(key_pressed_queue[queue_index]);
+            //console.log(key_pressed_queue[queue_index]);
             switch(key_pressed_queue[queue_index])
             {
                 case 'ArrowLeft':
@@ -295,10 +346,11 @@ function GridBox()
                     break;
             }
             updateQueueIndex(prev_value => 
-                {
-                    create_and_reset();
-                    return prev_value + 1;
-                });
+            {
+                //console.log(is_possible_to_fil);
+                //create_and_reset();
+                return prev_value + 1;
+            });
             
         }
     }
@@ -307,10 +359,9 @@ function GridBox()
     {
         const time_out_id = setInterval(()=>
         {
-            console.log("Running queue upgrade");
             fill_random_pos();
             clearInterval(time_out_id);
-        }, 80)
+        }, 80)   
     }
 
     function update_actual_board_obj(play_func)
