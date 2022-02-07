@@ -91,6 +91,7 @@ function GridBox()
         {
             update_actual_board_obj(!run);
         }, 70)
+        check_for_game_over();
     }, [board_vals])
 
     // for the initial copy from the board to the board values
@@ -105,6 +106,91 @@ function GridBox()
         document.addEventListener('keydown', handleKeyboardEvents);
         return ()=>document.removeEventListener('keydown', handleKeyboardEvents);
     }, [handleKeyboardEvents])
+
+    function is_full(__2d_board)
+    {
+        return __2d_board.some(board_item => board_item.some(item => item === 0));
+    }
+
+    function check_for_game_over()
+    {
+        if(!is_full(board_vals))
+        {
+            let check_2D_array = [];
+            let extracted_array = [];
+
+            // checking for possible left momement
+            board_vals.forEach((arr_item, index) =>
+            {
+                let [__empty__, updated_row] = calc_displacement(arr_item, index, 'left');
+                check_2D_array.push(updated_row);
+            })
+
+            // checking for possible right movement
+            if(!compare_2D_array(check_2D_array, board_vals))
+            {
+                check_2D_array = [];
+                board_vals.forEach((arr_item, item, index) =>
+                {
+                    let [__empty__, updated_row] = calc_displacement(arr_item.reverse(), index, 'right');
+                    check_2D_array.push(updated_row)
+                })
+
+                // checking for possible up movement
+                if(!compare_2D_array(check_2D_array, board_vals))
+                {
+                    check_2D_array = [
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                        [0, 0, 0, 0],
+                    ];
+                    
+                    for(let i = 0; i < 4; i++)
+                    {
+                        extracted_array = [];
+                        for(let j = 0; j < 4; j++)
+                            extracted_array.push(board_vals[j][i]);
+                        
+                        let [__empty__, updated_column] = up_down_calc_displacement(extracted_array, i, 'up');
+
+                        for(let j = 0; j < 4; j++)
+                            check_2D_array[j][i] = updated_column[j];
+                    }
+
+                    // checking for possible down movement
+                    if(!compare_2D_array(check_2D_array, board_vals))
+                    {
+                        check_2D_array = [
+                            [0, 0, 0, 0],
+                            [0, 0, 0, 0],
+                            [0, 0, 0, 0],
+                            [0, 0, 0, 0],
+                        ];
+                        
+                        for(let i = 0; i < 4; i++)
+                        {
+                            extracted_array = [];
+                            for(let j = 0; j < 4; j++)
+                                extracted_array.push(board_vals[j][i]);
+                            
+                            let [__empty__, updated_column] = up_down_calc_displacement(extracted_array.reverse(), i, 'down');
+    
+                            for(let j = 0; j < 4; j++)
+                                check_2D_array[j][i] = updated_column[j];
+                        }
+                        if(!compare_2D_array(check_2D_array, board_vals))
+                        {
+                            console.log("GAME OVER, NO POSSIBLE MOVES")
+                        }
+                    }
+                    
+
+                }
+            }
+        }
+    }
+
 
     function arrow_down_movment()
     {
@@ -174,6 +260,7 @@ function GridBox()
             [0, 0, 0, 0],
         ];
         updateRunVal(false);
+
         let temp_board_vals_copy = board_vals.map(board_item => board_item.map(item => item));
         let extracted_array = [];
         for(let i = 0; i < 4; i++)
