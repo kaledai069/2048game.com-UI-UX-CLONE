@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Grid from './Grid';
 import BackGrid from './BackGrid';
 import '../Css Styles/gridbox.css'
 import '../Css Styles/animate.css';
+import { score_context } from './Main';
 
 const COLORS =
 {
@@ -18,6 +19,8 @@ const COLORS =
 
 function GridBox()
 {
+    const score = useContext(score_context);
+
     const [board, updateBoard] = useState([
         [ {}, {}, {}, {} ], 
         [ {}, {}, {}, {} ], 
@@ -61,19 +64,9 @@ function GridBox()
         }
     }
 
-    // useEffect(()=>
-    // {
-    //     console.log(is_possible_to_fil);
-    //     if(is_possible_to_fil)
-    //     {
-    //         create_and_reset();
-    //     }
-    // }, [is_possible_to_fil])
-
     // for the key animation keys
     useEffect(()=>
     {   
-        let timeout_id;
         const interval_id = setInterval(()=>
         {
             run_keys_effect();
@@ -143,32 +136,32 @@ function GridBox()
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0)
         
         updateFillBool(prev_state => 
-            {   
-                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
-                if(present_state)
-                {
-                    create_and_reset();
-                }
-                return present_state;
-            });
+        {   
+            let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+            if(present_state)
+            {
+                create_and_reset();
+            }
+            return present_state;
+        });
 
         updateBoardVals(prev_vals => {
             return updated_board_vals;
         })
 
         updateBoard(prev_board => 
-            {
-                let board_copy = prev_board.map(board_item => board_item.map(item => item));
-                movement_tracker.forEach(item => 
-                    {
-                        item.forEach(sub_item =>
-                            {
-                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
-                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
-                            })
-                    })
-                return board_copy;
-            })
+        {
+            let board_copy = prev_board.map(board_item => board_item.map(item => item));
+            movement_tracker.forEach(item => 
+                {
+                    item.forEach(sub_item =>
+                        {
+                            let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                            board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                        })
+                })
+            return board_copy;
+        })
     }
 
     function arrow_up_movement()
@@ -252,32 +245,32 @@ function GridBox()
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
         
         updateFillBool(prev_state => 
-            {   
-                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
-                if(present_state)
-                {
-                    create_and_reset();
-                }
-                return present_state;
-            });
+        {   
+            let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+            if(present_state)
+            {
+                create_and_reset();
+            }
+            return present_state;
+        });
 
         updateBoardVals(prev_vals => {
             return updated_board_vals;
         })
 
         updateBoard(prev_board => 
-            {
-                let board_copy = prev_board.map(board_item => board_item.map(item => item));
-                movement_tracker.forEach(item => 
-                    {
-                        item.forEach(sub_item =>
-                            {
-                                let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
-                                board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
-                            })
-                    })
-                return board_copy;
-            })
+        {
+            let board_copy = prev_board.map(board_item => board_item.map(item => item));
+            movement_tracker.forEach(item => 
+                {
+                    item.forEach(sub_item =>
+                        {
+                            let animate_class_name = `animate_${sub_item['initial_row']}-${sub_item['initial_column']}_${sub_item['final_row']}-${sub_item['final_column']}`;
+                            board_copy[sub_item['initial_row']][sub_item['initial_column']]['class_name'] = `grid1 ${animate_class_name}`;
+                        })
+                })
+            return board_copy;
+        })
     }
 
     function arrow_left_movement()
@@ -296,16 +289,15 @@ function GridBox()
         })
         movement_tracker = movement_tracker.filter(moment_obj => moment_obj.length > 0);
 
-        console.log(compare_2D_array(temp_board_vals_copy, updated_board_vals));
         updateFillBool(prev_state => 
-            {   
-                let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
-                if(present_state)
-                {
-                    create_and_reset();
-                }
-                return present_state;
-            });
+        {   
+            let present_state = compare_2D_array(temp_board_vals_copy, updated_board_vals);
+            if(present_state)
+            {
+                create_and_reset();
+            }
+            return present_state;
+        });
         updateBoardVals(prev_vals => {
             return updated_board_vals;
         })
@@ -329,7 +321,6 @@ function GridBox()
     {
         if(key_pressed_queue.length > 0 && queue_index < key_pressed_queue.length)
         {
-            //console.log(key_pressed_queue[queue_index]);
             switch(key_pressed_queue[queue_index])
             {
                 case 'ArrowLeft':
@@ -347,11 +338,8 @@ function GridBox()
             }
             updateQueueIndex(prev_value => 
             {
-                //console.log(is_possible_to_fil);
-                //create_and_reset();
                 return prev_value + 1;
             });
-            
         }
     }
 
@@ -427,13 +415,15 @@ function GridBox()
         }
     }
 
-    function column_index(dir, index)
+    function index_calc(dir, index)
     {
         switch(dir)
         {
             case 'left':
+            case 'up':
                 return index;
             case 'right':
+            case 'down':
                 return 3 - index;
         }
     }
@@ -453,49 +443,50 @@ function GridBox()
         }
     }
 
-    function row_index(direction, index)
-    {
-        switch(direction)
-        {
-            case 'up':
-                return index;
-            case 'down':
-                return 3 - index;
-        }
-    }
-
     function up_down_calc_displacement(test_array, column_val, direction)
     {
         let temp_int;
         let movements = []
+        let doubled_value = false;
+
+        let all_same_value = true;
+        for(let i = 1; i < 4; i++)
+            if(test_array[i] !== test_array[0])
+                all_same_value = false;
 
         for(let i = 0; i < 4; i++)
         {
             if(test_array[i] !== 0 && i !== 0)
             {
                 let pos_obj = {};
-                //pos_obj = {...pos_obj, initial_row: row_val, initial_column: column_index(direction, i), final_row: row_val};
-                pos_obj = {...pos_obj, initial_row: row_index(direction, i), initial_column: column_val, final_column: column_val};
+                pos_obj = {...pos_obj, initial_row: index_calc(direction, i), initial_column: column_val, final_column: column_val};
                 temp_int = test_array[i];
                 test_array[i] = 0;
                 for(let k = i - 1; k >= 0; k--)
                 {
-                    if(test_array[k] === temp_int)
+                    if(doubled_value && test_array[k] === temp_int && !all_same_value)
                     {
-                        // pos_obj = {...pos_obj, final_column: column_index(direction, k)};
-                        pos_obj = {...pos_obj, final_row: row_index(direction, k)};
-                        test_array[k] = 2 * temp_int;
+                        pos_obj = {...pos_obj, final_row: index_calc(direction, k + 1)};
+                        test_array[k+1] = temp_int;
                         break;
                     }
-                    else if(test_array[k] !== 0 && test_array[k] !== temp_int)
+                    else if(test_array[k] === temp_int)
                     {
-                        pos_obj = {...pos_obj, final_row: row_index(direction, k + 1)};
+                        pos_obj = {...pos_obj, final_row: index_calc(direction, k)};
+                        test_array[k] = 2 * temp_int;
+                        score.updater(prev_val => prev_val += (2*temp_int));
+                        doubled_value = true;
+                        break;
+                    }
+                    if(test_array[k] !== 0 && test_array[k] !== temp_int)
+                    {
+                        pos_obj = {...pos_obj, final_row: index_calc(direction, k + 1)};
                         test_array[k+1] = temp_int;
                         break;
                     }
                     else if(k === 0)
                     {
-                        pos_obj = {...pos_obj, final_row: row_index(direction, k)};
+                        pos_obj = {...pos_obj, final_row: index_calc(direction, k)};
                         test_array[k] = temp_int;
                     }
                 }
@@ -512,32 +503,46 @@ function GridBox()
     {
         let temp_int;
         let movements = []
+        let doubled_value = false;
 
+        let all_same_value = true;
+        for(let i = 1; i < 4; i++)
+            if(test_array[i] !== test_array[0])
+                all_same_value = false;
+    
         for(let i = 0; i < 4; i++)
         {
             if(test_array[i] !== 0 && i !== 0)
             {
                 let pos_obj = {};
-                pos_obj = {...pos_obj, initial_row: row_val, initial_column: column_index(direction, i), final_row: row_val};
+                pos_obj = {...pos_obj, initial_row: row_val, initial_column: index_calc(direction, i), final_row: row_val};
                 temp_int = test_array[i];
                 test_array[i] = 0;
                 for(let k = i - 1; k >= 0; k--)
                 {
-                    if(test_array[k] === temp_int)
+                    if(doubled_value && test_array[k] === temp_int && !all_same_value)
                     {
-                        pos_obj = {...pos_obj, final_column: column_index(direction, k)};
+                        pos_obj = {...pos_obj, final_column: index_calc(direction, k + 1)};
+                        test_array[k+1] = temp_int;
+                        break;
+                    }
+                    else if(test_array[k] === temp_int)
+                    {
+                        pos_obj = {...pos_obj, final_column: index_calc(direction, k)};
                         test_array[k] = 2 * temp_int;
+                        score.updater(prev_val => prev_val += (2*temp_int));
+                        doubled_value = true;
                         break;
                     }
                     else if(test_array[k] !== 0 && test_array[k] !== temp_int)
                     {
-                        pos_obj = {...pos_obj, final_column: column_index(direction, k + 1)};
+                        pos_obj = {...pos_obj, final_column: index_calc(direction, k + 1)};
                         test_array[k+1] = temp_int;
                         break;
                     }
                     else if(k === 0)
                     {
-                        pos_obj = {...pos_obj, final_column: column_index(direction, k)};
+                        pos_obj = {...pos_obj, final_column: index_calc(direction, k)};
                         test_array[k] = temp_int;
                     }
                 }
@@ -592,41 +597,6 @@ function GridBox()
                 )
         })
     }
-
-    // function get_empty_space(present_data)
-    // {
-    //     let count = 0;
-    //     let temp_arr = [];
-    //     for(let i = 0; i < 4; i++)
-    //     {
-    //         for(let j = 0; j < 4; j++, count++)
-    //         {
-    //             if(present_data[i][j] === 0)
-    //                 temp_arr.push(count)
-    //         }
-    //     }
-    //     let pos = temp_arr[Math.floor(Math.random() * temp_arr.length)];
-    //     let num = Math.floor(Math.random()*100) % 2 == 0 ? 2 : 4;
-    //     return [pos, num];
-    // }
-
-    // function fill_available_space()
-    // {
-    //     updateBoardVals(prev_data =>
-    //     {
-    //         const [pos, num] = get_empty_space(prev_data);
-    //         console.log(pos, num);
-    //         let temp = -1;
-    //         return prev_data.map(board_item =>
-    //             {
-    //                 board_item.map(item =>
-    //                     (pos === ++temp) ? 
-    //                     num : 
-    //                     item
-    //                     )
-    //             })
-    //     })
-    // }
 
     return (
         <div className="grid_box_container">

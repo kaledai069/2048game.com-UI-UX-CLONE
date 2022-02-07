@@ -1,8 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import '../Css Styles/main.css'
+import { score_context } from './Main';
 
 function Display()
 {
+    const score = useContext(score_context);
+
     return(
         <>
             <div className="display-container">
@@ -15,7 +18,7 @@ function Display()
                         <div className="score_text">
                             SCORE
                         </div>
-                        <div className="score_digit">69</div>
+                        <div className="score_digit">{score.val}</div>
                     </div>
                     <button className = 'btn'>new game</button>
                 </div>
