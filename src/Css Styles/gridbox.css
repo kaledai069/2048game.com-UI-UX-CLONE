@@ -56,20 +56,40 @@
     }
 }
 
-.animate_1_4
+.overlay
 {
-    animation: movement_1_4 0.2s linear both;
+    background-color: #766f65;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 3px;
+    opacity: 0.68;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
 }
 
-@keyframes movement_1_4 {
-    from
-    {
-        top: 12px;
-        left: 12px;
-    }
-    to
-    {
-        top: 12px;
-        left: 340.5px;
-    }
+.overlay > div > button
+{
+    text-transform: uppercase;
+    font-size: 24px;
+    padding: 0.8rem;
+    border-radius: 25px;
+    margin-top: 4rem;
+}
+.hide_element
+{
+    display: none;
+}
+
+.final_score_data
+{
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
 }

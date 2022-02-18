@@ -15,6 +15,9 @@ const COLORS =
     64 : '#f75f3b',
     128 : '#edd073',
     256 : '#edcc62',
+    512 : '#be2c18',
+    1024 : '#a9b40b', 
+    2048 : '#369200'
 }
 
 const initial_board_state = [
@@ -23,6 +26,7 @@ const initial_board_state = [
     [ {}, {}, {}, {} ], 
     [ {}, {}, {}, {} ]
 ];
+
 
 const initial_board_value = 
     [
@@ -35,7 +39,7 @@ const initial_board_value =
 function GridBox()
 {
     const score = useContext(score_context);
-
+    const [game_over_bool, setGameOver] = useState(false);
     const [board, updateBoard] = useState(initial_board_state);
     const [board_vals, updateBoardVals] = useState(Array(4).fill().map(()=>Array(4).fill(0)))
     const [key_pressed_queue, updateKeyQueue] = useState([]);
@@ -47,11 +51,7 @@ function GridBox()
     const handleKeyboardEvents = (event) =>
     {
         let key_pressed_string = '';
-        if(event.key == ' ')
-        {
-            fill_random_pos();
-        }
-        else if(event.code == 'ArrowLeft')
+        if(event.code == 'ArrowLeft')
         {
             key_pressed_string = 'ArrowLeft';
         }
@@ -74,6 +74,20 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: INITIAL RUN
+            -  after rendering the minimum given components, this side effect hook runs [ fill_random_pos() ] x 2
+    */
+    useEffect(()=>
+    {
+        fill_random_pos();
+        fill_random_pos();
+    }, [])
+
+    /*
+        HEADER: REFLECTION OF NEW GAME BUTTON EVENT
+            - reflects and takes the action into consideration for this component based upon the dispatched function from Main.js
+    */
     useEffect(()=>
     {
         if(new_game_value.new_game == 1)
@@ -87,12 +101,16 @@ function GridBox()
             fill_random_pos();
             fill_random_pos();
             score.updater(0);
+            new_game_value.new_game_updater(0);
         }
     }, [new_game_value.new_game])
 
-
-
-    // for the key animation keys
+    /*
+        HEADER: ANIMATION ACTION
+            - based upon the key pressed queues and with the queue index incremented,
+              every keys encountered in the queue is dequeued and the corresponding
+              action is taken.
+    */
     useEffect(()=>
     {   
         const interval_id = setInterval(()=>
@@ -105,23 +123,12 @@ function GridBox()
         };
     }, [key_pressed_queue, queue_index])
 
-    // for the initial run
-    useEffect(()=>
-    {
-        fill_random_pos();
-        fill_random_pos();
-
-        // let temp_2D_array = 
-        // [
-        //     [2, 4, 8, 4],
-        //     [8, 16, 64, 2],
-        //     [16, 32, 128, 8],
-        //     [4, 8, 2, 4]
-        // ]
-        // updateBoardVals(temp_2D_array);
-    }, [])
-
-    // for the board copied values to update the actual board animation
+    /*
+        HEADER: REFLECT BOARD VALUE TO BOARD BLOCKS
+            - Changes to the action are integrated and managed through a seperate array.
+            - Board value / content from this seperate array is rendered as the blocks 
+              along with the proper animation required.
+    */
     useEffect(()=>
     {
         setTimeout(()=>
@@ -131,24 +138,54 @@ function GridBox()
         check_for_game_over();
     }, [board_vals])
 
-    // for the initial copy from the board to the board values
+    /*
+        HEADER: HELPER SIDE EFFECT
+            - copies the initial board state to the board value array
+            - one time required updater
+    */
     useEffect(()=>
     {
         update_copy_board_vals(run);
     }, [board]);
 
-    // to set and reset the event handlers for the keyboard keys
+    /*
+        HEADER: EVENT LISTENERS SUBSCRIPTIONS
+            - add event listeners and remove for every keyboard events registered
+    */
     useEffect(()=>
     {
         document.addEventListener('keydown', handleKeyboardEvents);
         return ()=>document.removeEventListener('keydown', handleKeyboardEvents);
     }, [handleKeyboardEvents])
 
+
+    /*
+        HEADER: HANDLER FOR TRY AGAIN BUTTON
+            - updates the new game value to 1,
+            - set the game over bool to false
+    */
+    const try_again_handler = ()=>
+    {
+        new_game_value.new_game_updater(1);
+        setGameOver(false);
+    }
+
+    /*
+        HEADER: HELPER FUNCTION
+            - returns if the supplied 2D array is full or not 
+    */
     function is_full(__2d_board)
     {
         return __2d_board.some(board_item => board_item.some(item => item === 0));
     }
 
+    /*
+        HEADER: GAME OVER LOGIC CHECKER
+            - takes an instant of the board values 2D array,
+            - mimics all four arrow movement,
+            - checks the mimiced result with the initial instant and 
+              decides whether there is no further moves available
+    */
     function check_for_game_over()
     {
         if(!is_full(board_vals))
@@ -218,7 +255,7 @@ function GridBox()
                         }
                         if(!compare_2D_array(check_2D_array, board_vals))
                         {
-                            console.log("GAME OVER, NO POSSIBLE MOVES")
+                            setGameOver(true);
                         }
                     }
                 }
@@ -226,7 +263,13 @@ function GridBox()
         }
     }
 
-
+    /*
+        HEADER: DOWN KEY EVENT HANDLER
+            - first the action of the event is reflected to the board values 2D array
+            - along with the manipulation of board values, the animation or linear movement of the blocks are
+              configured in an array of objects
+            - every animation information from the AOO is then applied to the board blocks
+    */
     function arrow_down_movment()
     {
         let movement_tracker = [];
@@ -285,6 +328,13 @@ function GridBox()
         })
     }
 
+    /*
+    HEADER: UP KEY EVENT HANDLER
+        - first the action of the event is reflected to the board values 2D array
+        - along with the manipulation of board values, the animation or linear movement of the blocks are
+            configured in an array of objects
+        - every animation information from the AOO is then applied to the board blocks
+    */
     function arrow_up_movement()
     {
         let movement_tracker = [];
@@ -343,6 +393,10 @@ function GridBox()
             })
     }
 
+    /*
+        HEADER: HELPER FUNCTION
+            - compare if two 2D arrays are similar in content or not
+    */
     function compare_2D_array(first_array, second_array)
     {
         for(let i = 0; i < 4; i++)
@@ -352,6 +406,13 @@ function GridBox()
         return false;
     }
 
+    /*
+        HEADER: RIGHT KEY EVENT HANDLER
+            - first the action of the event is reflected to the board values 2D array
+            - along with the manipulation of board values, the animation or linear movement of the blocks are
+              configured in an array of objects
+            - every animation information from the AOO is then applied to the board blocks
+    */
     function arrow_right_movement()
     {
         let movement_tracker = [];
@@ -395,6 +456,13 @@ function GridBox()
         })
     }
 
+    /*
+        HEADER: LEFT KEY EVENT HANDLER
+            - first the action of the event is reflected to the board values 2D array
+            - along with the manipulation of board values, the animation or linear movement of the blocks are
+              configured in an array of objects
+            - every animation information from the AOO is then applied to the board blocks
+    */
     function arrow_left_movement()
     {
         let movement_tracker = [];
@@ -439,6 +507,11 @@ function GridBox()
         })
     }
 
+    /*
+        HEADER: RUN EFFECTS FOR KEYS USING REGISTERED-KEY-QUEUE
+            - for key registered queue with occupied values, the corresponding effect is executed 
+              for the dequeued action value
+    */
     function run_keys_effect()
     {
         if(key_pressed_queue.length > 0 && queue_index < key_pressed_queue.length)
@@ -465,6 +538,10 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: HELPER FUNCTION
+            - fills the available position in the block with certain delay
+    */
     function create_and_reset()
     {
         const time_out_id = setInterval(()=>
@@ -474,6 +551,10 @@ function GridBox()
         }, 80)   
     }
 
+    /*
+        HEADER: SYNCHRONIZE THE BOARD BLOCKS WITH THE BOARD VALUES
+            - copies the effect / insertions from the board value to the board blocks
+    */
     function update_actual_board_obj(play_func)
     {
         if(play_func)
@@ -520,6 +601,11 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: HELPER FUNCTION
+            - runs initially for copying the values initially set directly to the blocks to the
+              board values 2D array
+    */
     function update_copy_board_vals(play_func)
     {
         if(play_func)
@@ -537,6 +623,10 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: DIRECTIVE FUNCTION
+            - calculates the index for the block to be shifted depending upon the direction / action of keys
+    */
     function index_calc(dir, index)
     {
         switch(dir)
@@ -550,6 +640,10 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: HELPER FUNCTION
+            - adjust the array according to the direction / action of keys
+    */
     function array_order_adjustifier(direction, array)
     {
         switch(direction)
@@ -565,6 +659,11 @@ function GridBox()
         }
     }
 
+    /*
+        HEADER: UP DOWN DISPLACEMENT OF BLOCKS
+            - depending upon up / down movement encountered, the data from the board value 2D array
+              is movement with the necessary displacement calculation 
+    */
     function up_down_calc_displacement(test_array, column_val, direction)
     {
         let temp_int;
@@ -621,6 +720,11 @@ function GridBox()
             return [0, array_order_adjustifier(direction, test_array)];
     }
 
+    /*
+        HEADER: LEFT RIGHT DISPLACEMENT OF BLOCKS
+            - depending upon left / right movement encountered, the data from the board value 2D array
+              is movement with the necessary displacement calculation 
+    */
     function calc_displacement(test_array, row_val, direction)
     {
         let temp_int;
@@ -677,6 +781,10 @@ function GridBox()
             return [0, array_order_adjustifier(direction, test_array)];
     }
 
+    /*
+        HEADER: HELPER FUNCTION
+            - iterates 2D board value array for the available (i, j)th element with value 0 i.e. empty
+    */
     const get_available_space = (present_data) =>
     {
         let count = 0;
@@ -690,10 +798,15 @@ function GridBox()
             }
         }
         let pos = temp_arr[Math.floor(Math.random() * temp_arr.length)];
-        let num = Math.floor(Math.random()*100) % 2 == 0 ? 2 : 4;
+        let num = Math.floor(Math.random()*100) % 2 === 0 ? 2 : 4;
         return [pos, num];
     }
 
+    /*
+        HELPER: ACTION FUNCTION
+            - initially run
+            - fills the board with the data / block at available random position
+    */
     const fill_random_pos = () =>
     {
         updateRunVal(true);
@@ -703,7 +816,7 @@ function GridBox()
             let temp = -1;
             return prev_data.map(board_item => 
                 board_item.map(item =>
-                        (pos == ++temp) ? 
+                        (pos === ++temp) ? 
                         {
                             text: num,
                             position: {
@@ -726,6 +839,12 @@ function GridBox()
             {
                 board.map(board_item => board_item.map((item, index) => <Grid key = {index} data = {item}/>))
             }
+            <div className={`overlay ${!game_over_bool ? 'hide_element' : ''}`}>
+                <div className='final_score_data'>Score: {score.val}</div>
+                <div>
+                    <button onClick={try_again_handler}>Try Again</button>
+                </div>
+            </div>
         </div>
     )
 }
