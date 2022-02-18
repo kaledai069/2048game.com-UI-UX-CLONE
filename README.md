@@ -1,5 +1,18 @@
 # ACCESS THE PROTO AT: 
 https://buggy-2048.netlify.app/
+
+## POINTS TO BE NOTED
+* Its F**KIN' Buggy
+* I don't know how react.js works at all
+* Trying to implement every logic with react.js alone with hooks will eventually f**k you 
+* OR either I definitely have no f**kin' idea to work with hooks
+
+## BUGGED PROTO
+* Keys are to be pressed at a minimum interval of 0.4 sec.
+* Doing fast key entries won't broke the logic but a series of moves are transited quickly to catch up.
+* Also with the fast key entries, the intermediate filling of the available spaces with new block is halted temporarily for the purpose of administrating the essence of patience to the user. (HEHE)
+* 2048 game is won when one playing is able to make any of the block value 2048 (OBVIOUSLY), but considering my private highest score isn't more than 512, I haven't implemented the logic for winning the game. (HONESTY SHINES)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
